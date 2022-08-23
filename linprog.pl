@@ -103,10 +103,10 @@ lpsolve(OldVars,FutureVars,Data,FutureRemain) :-
      lpsolve(NewVars,FutureVars,Remain,FutureRemain).
 
     
-doSomeRecursion([]).
-doSomeRecursion([(VarName, Var)|Rest]) :- fd_dom(Var, Dom), write(VarName), write(":"), write(Dom), doSomeRecursion(Rest).
+searchDomainAndWrite([]).
+searchDomainAndWrite([(VarName, Var)|Rest]) :- fd_dom(Var, Dom), write(VarName), write(":"), write(Dom), searchDomainAndWrite(Rest).
 % [the,variable,x,equals,3,fullstop,the,variable,q,equals,3,fullstop,z,is,less,than,10,fullstop,it,is,greater,than,5,fullstop]
-analyse(List) :- lpsolve(List,Answers),doSomeRecursion(Answers).
+analyse(List) :- lpsolve(List,Answers),searchDomainAndWrite(Answers).
 % analyse([the,variable,x,equals,3,fullstop,the,variable,q,equals,3,fullstop,z,is,less,than,10,fullstop,it,is,greater,than,5,fullstop]).
 % phrase(sentence(OldVars, NewVars),[the,variable,x,lies,between,0,and,10,fullstop,variable,x,varies,from,1,to,20,fullstop,it,is,greater,than,q,fullstop]).
 % lpsolve([the,variable,x,lies,between,0,and,10,fullstop,variable,x,varies,from,1,to,20,fullstop],Answers).
