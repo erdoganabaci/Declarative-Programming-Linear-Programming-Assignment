@@ -1,3 +1,5 @@
+% Erdogan ABACI 0584957
+
 % import necessary libs
 :- use_module([library(lists),library(clpfd)]).
 
@@ -67,11 +69,10 @@ math_calculation(Vars,Vars,Number) --> [Number].
 % basically math operation resursive step
 % y is less than 5 + 2 * q. This recursion will look at all possible cases if it's making cases that are incorrect according to add some additional checks inside {}
 math_calculation(OldVars, NewVars, Number + Result) --> [Number] , [+], math_calculation(OldVars, NewVars, Result).
-% phrase(sentence(OldVars, NewVars),[y,is,less,than,5,+,2,-,1,fullstop]).
+
 math_calculation(OldVars, NewVars, Number - Result) --> [Number] , [-], math_calculation(OldVars, NewVars, Result).
 
 math_calculation(OldVars, NewVars, Number - Result) --> [Number] , [/], math_calculation(OldVars, NewVars, Result).
-
 
 math_calculation(OldVars, NewVars, VarA + VarB) --> [A], [plus], [B], {
 lookup(A, OldVars, InterimVars, VarA),
@@ -93,7 +94,6 @@ math_calculation(OldVars, NewVars, (VarZ // Number)) --> division,[Z], [and], [N
 lookup(Z, OldVars, NewVars, VarZ)
 }.
 
-
 % this is parses all sentences and add spesify constraint
 lpsolve( Data, Answers ) :-
     lpsolve( [], Answers, Data, [] ).
@@ -104,72 +104,52 @@ lpsolve(OldVars,FutureVars,Data,FutureRemain) :-
      phrase(sentence( OldVars,NewVars),Data,Remain),
      lpsolve(NewVars,FutureVars,Remain,FutureRemain).
 
-% well format of output and printouts following sideeffects
+% well format of output and print outs following side-effects
 searchDomainAndWrite([],[]).
-% analyse([the,variable,x,is,greater,than,3,fullstop],Residue).
+% if domain is not finite,print out that there may be an in nite number of solutions
 searchDomainAndWrite([(VarName, Var)|Rest],[[VarName]-Dom|RestResidue]) :- fd_dom(Var, Dom), fd_size(Var,sup),write(VarName), write(":"),write(" "),write("this var name is infite number of solutions\n"),searchDomainAndWrite(Rest,RestResidue).
-% analyse([the,variable,x,equals,3,fullstop],Residue).
+% if there is a unique solution, print out form a = N
 searchDomainAndWrite([(VarName, Var)|Rest],[[VarName]-Dom|RestResidue]) :- fd_dom(Var, Dom), fd_size(Var,Size),Size is 1,fd_sup(Var,Value),write(VarName), write("="),write(Value),write("\n"),searchDomainAndWrite(Rest,RestResidue).
-% analyse([the,variable,x,lies,between,0,and,10,fullstop],Residue).
+% print out succeed case
 searchDomainAndWrite([(VarName, Var)|Rest],[[VarName]-Dom|RestResidue]) :- fd_dom(Var, Dom),fd_size(Var,Size),Size \= sup,Size > 1,write(VarName), write(" in "),write(Dom),write("\n"),searchDomainAndWrite(Rest,RestResidue).
 analyse(List,Residue) :- lpsolve(List,Answers),searchDomainAndWrite(Answers,Residue).
-% analyse([the,variable,x,lies,between,0,and,10,fullstop,variable,y,varies,from,10,to,-10,fullstop,a,variable,z,is, in,the,range,0,to,15,fullstop,it,equals,x,plus,y,fullstop,y,is,less,than,5,+,2,*,x,fullstop,x,is,greater,than,y,times,2,fullstop,variable,y,is,greater,than,or,equal,to,the,quotient,of,z,and,4,fullstop],Residue).
-% analyse([the,variable,x,lies,between,0,and,10,fullstop,variable,y,varies,from,10,to,-10,fullstop,a,variable,z,is, in,the,range,0,to,15,fullstop,it,equals,x,plus,y,fullstop,y,is,less,than,5,+,2,*,x,fullstop,x,is,greater,than,y,times,2,fullstop,variable,y,is,greater,than,or,equal,to,the,quotient,of,z,and,4,fullstop,w,equals,3,fullstop,v,is,less,than,2,fullstop],Residue).
 
-% analyse([the,variable,x,is,greater,than,3,fullstop],Residue).
-% first sentences test
-test1(OldVars,NewVars) :- phrase(sentence(OldVars,NewVars),[the,variable,x,lies,between,0,and,10,fullstop]).
-% usage
-% test1(A,B).
-test2(Residue) :- analyse([the,variable,x,lies,between,0,and,10,fullstop,variable,y,varies,from,10,to,-10,fullstop,a,variable,z,is, in,the,range,0,to,15,fullstop,it,equals,x,plus,y,fullstop,y,is,less,than,5,+,2,*,x,fullstop,x,is,greater,than,y,times,2,fullstop,variable,y,is,greater,than,or,equal,to,the,quotient,of,z,and,4,fullstop],Residue).
-
-% analyse([the,variable,x,lies,between,0,and,10,fullstop,variable,y,varies,from,10,to,-10,fullstop,a,variable,z,is, in,the,range,0,to,15,fullstop,it,equals,x,plus,y,fullstop,y,is,less,than,5,+,2,*,x,fullstop,x,is,greater,than,y,times,2,fullstop,variable,y,is,greater,than,or,equal,to,the,quotient,of,z,and,4,fullstop]).% analyse([the,variable,x,equals,3,fullstop,the,variable,q,equals,3,fullstop,z,is,less,than,10,fullstop,it,is,greater,than,5,fullstop]).
-% phrase(sentence(OldVars, NewVars),[the,variable,x,lies,between,0,and,10,fullstop,variable,x,varies,from,1,to,20,fullstop,it,is,greater,than,q,fullstop]).
-% lpsolve([the,variable,x,lies,between,0,and,10,fullstop,variable,x,varies,from,1,to,20,fullstop],Answers).
-% lpsolve([the,variable,x,equals,3,fullstop,variable,y,equals,2,fullstop,variable,z,is,less,than,10,fullstop,it,equals,x,plus,y,fullstop],Answers).
-% lpsolve([x,is,greater,than,q,fullstop],Answers).
-% lpsolve([the,variable,x,equals,3,fullstop,the,variable,q,equals,3,fullstop,z,is,less,than,10,fullstop,it,is,greater,than,5,fullstop],Answers).
-
-% lpsolve([the,variable,x,lies,between,0,and,10,fullstop,variable,x,varies,from,1,to,20,fullstop],Answers).
-% phrase(sentence(OldVars, NewVars),[the,variable,x,lies,between,0,and,10,fullstop]).
-% phrase(sentence(OldVars, NewVars),[variable,x,varies,from,1,to,20,fullstop]).
-% phrase(sentence(OldVars, NewVars),[a,variable,x,is, in,the,range,100,to,14,fullstop]).
-
+% Tested following sentences
 
 % The variable x lies between 0 and 10.
 % Variable y varies from 10 to -10.
 % A variable z is in the range 0 to 15.
 % It equals x plus y.
-% All these variables are greater than -20
 % y is less than 5 + 2 * x.
 % x is greater than y times 2.
 % Variable y is greater than or equal to the quotient of z and 4.
 
-% [the,variable,x,lies,between,0,and,10,fullstop]
-% [variable,y,varies,from,10,to,-10,fullstop]
-% [a,variable,z,is, in,the,range,0,to,15,fullstop]
-% [it,equals,x,plus,y,fullstop]
-% [y,is,less,than,5,+,2,*,x,fullstop]
-% [x,is,greater,than,y,times,2,fullstop]
-% [variable,y,is,greater,than,or,equal,to,the,quotient,of,z,and,4,fullstop]
+% due to the limitation of phrase we can only test 1 sentence at the same time.
+test(OldVars,NewVars) :- phrase(sentence(OldVars,NewVars),[the,variable,x,lies,between,0,and,10,fullstop]).
+test1(OldVars,NewVars) :- phrase(sentence(OldVars,NewVars),[variable,y,varies,from,10,to,-10,fullstop]).
+test2(OldVars,NewVars) :- phrase(sentence(OldVars,NewVars),[a,variable,z,is,in,the,range,0,to,15,fullstop]).
+test3(OldVars,NewVars) :- phrase(sentence(OldVars,NewVars),[it,equals,x,plus,y,fullstop]).
+test4(OldVars,NewVars) :- phrase(sentence(OldVars,NewVars),[y,is,less,than,5,+,2,*,x,fullstop]).
+test5(OldVars,NewVars) :- phrase(sentence(OldVars,NewVars),[x,is,greater,than,y,times,2,fullstop]).
+test6(OldVars,NewVars) :- phrase(sentence(OldVars,NewVars),[variable,y,is,greater,than,or,equal,to,the,quotient,of,z,and,4,fullstop]).
 
-% phrase(sentence(OldVars, NewVars),[the,variable,x,lies,between,0,and,10,fullstop]).
-% phrase(sentence(OldVars, NewVars),[variable,y,varies,from,10,to,-10,fullstop]).
-% phrase(sentence(OldVars, NewVars),[a,variable,z,is, in,the,range,0,to,15,fullstop]).
-% phrase(sentence(OldVars, NewVars),[it,equals,x,plus,y,fullstop]).
-% phrase(sentence(OldVars, NewVars),[y,is,less,than,5,+,2,*,x,fullstop]).
-% phrase(sentence(OldVars, NewVars),[x,is,greater,than,y,times,2,fullstop]).
-% phrase(sentence(OldVars, NewVars),[variable,y,is,greater,than,or,equal,to,the,quotient,of,z,and,4,fullstop]).
+% cumulative adding test
+testSentence(Residue) :- analyse([the,variable,x,lies,between,0,and,10,fullstop],Residue).
+testSentence1(Residue) :- analyse([the,variable,x,lies,between,0,and,10,fullstop,variable,y,varies,from,10,to,-10,fullstop],Residue).
+testSentence2(Residue) :- analyse([the,variable,x,lies,between,0,and,10,fullstop,variable,y,varies,from,10,to,-10,fullstop,a,variable,z,is,in,the,range,0,to,15,fullstop],Residue).
+testSentence3(Residue) :- analyse([the,variable,x,lies,between,0,and,10,fullstop,variable,y,varies,from,10,to,-10,fullstop,a,variable,z,is,in,the,range,0,to,15,fullstop,it,equals,x,plus,y,fullstop],Residue).
+testSentence4(Residue) :- analyse([the,variable,x,lies,between,0,and,10,fullstop,variable,y,varies,from,10,to,-10,fullstop,a,variable,z,is,in,the,range,0,to,15,fullstop,it,equals,x,plus,y,fullstop,y,is,less,than,5,+,2,*,x,fullstop],Residue).
+testSentence5(Residue) :- analyse([the,variable,x,lies,between,0,and,10,fullstop,variable,y,varies,from,10,to,-10,fullstop,a,variable,z,is,in,the,range,0,to,15,fullstop,it,equals,x,plus,y,fullstop,y,is,less,than,5,+,2,*,x,fullstop,x,is,greater,than,y,times,2,fullstop],Residue).
+testSentence6(Residue) :- analyse([the,variable,x,lies,between,0,and,10,fullstop,variable,y,varies,from,10,to,-10,fullstop,a,variable,z,is,in,the,range,0,to,15,fullstop,it,equals,x,plus,y,fullstop,y,is,less,than,5,+,2,*,x,fullstop,x,is,greater,than,y,times,2,fullstop,variable,y,is,greater,than,or,equal,to,the,quotient,of,z,and,4,fullstop],Residue).
 
+% side effects test
+% infinite doamin test
+testFailCase(Residue) :-  analyse([the,variable,x,is,greater,than,3,fullstop],Residue).
+% unique solution test
+testFailCase1(Residue) :- analyse([the,variable,x,equals,3,fullstop],Residue).
+% succeed test
+testSuccess(Residue) :-  analyse([the,variable,x,lies,between,0,and,10,fullstop],Residue).
 
-% lpsolve([the,variable,x,lies,between,0,and,10,fullstop,variable,y,varies,from,10,to,-10,fullstop,a,variable,z,is, in,the,range,0,to,15,fullstop,it,equals,x,plus,y,fullstop,y,is,less,than,5,+,2,*,x,fullstop],Answers).
+% all sentences test
+testAllSentences(Residue) :- analyse([the,variable,x,lies,between,0,and,10,fullstop,variable,y,varies,from,10,to,-10,fullstop,a,variable,z,is,in,the,range,0,to,15,fullstop,it,equals,x,plus,y,fullstop,y,is,less,than,5,+,2,*,x,fullstop,x,is,greater,than,y,times,2,fullstop,variable,y,is,greater,than,or,equal,to,the,quotient,of,z,and,4,fullstop],Residue).
 
-% return true;
-% lpsolve([the,variable,x,lies,between,0,and,10,fullstop,variable,y,varies,from,10,to,-10,fullstop,a,variable,z,is, in,the,range,0,to,15,fullstop,it,equals,x,plus,y,fullstop,y,is,less,than,5,+,2,*,x,fullstop,x,is,greater,than,y,times,2,fullstop],Answers).
-
-% lpsolve([the,variable,x,lies,between,0,and,10,fullstop,variable,y,varies,from,10,to,-10,fullstop,a,variable,z,is, in,the,range,0,to,15,fullstop,it,equals,x,plus,y,fullstop,y,is,less,than,5,+,2,*,x,fullstop,x,is,greater,than,y,times,2,fullstop,variable,y,is,greater,than,or,equal,to,the,quotient,of,z,and,4,fullstop],Answers).
-
-
-% lpsolve([x,is,greater,than,y,times,2,fullstop],Answers).
-% lpsolve([variable,y,is,greater,than,the,dividend,of,z,and,4,fullstop],Answer).
-% variable,y,varies,from,10,to,-10,fullstop,a,variable,z,is,in,the,range,0,to,15,fullstop,
